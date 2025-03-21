@@ -37,6 +37,7 @@ class Game:
         self.current_block = self.get_random_block()
         self.next_block = self.get_random_block()
         self.game_over = False
+        self.paused = False
         self.score = 0
 
     def update_score(self, lines_cleared, moved_down_points):
@@ -63,6 +64,8 @@ class Game:
         ]
         self.current_block = self.get_random_block()
         self.next_block = self.get_random_block()
+        self.game_over = False
+        self.paused = False
         self.score = 0
 
     def draw(self, screen: pygame.Surface):
@@ -107,32 +110,41 @@ class Game:
 
     def move_left(self):
         """move_left"""
-        self.current_block.move(0, -1)
-        if self.block_inside() is False or self.block_fits() is False:
-            self.current_block.move(0, 1)
+        if self.paused is False and self.game_over is False:
+            self.current_block.move(0, -1)
+
+            if self.block_inside() is False or self.block_fits() is False:
+                self.current_block.move(0, 1)
 
     def move_right(self):
         """move_right"""
-        self.current_block.move(0, 1)
-        if self.block_inside() is False or self.block_fits() is False:
-            self.current_block.move(0, -1)
+        if self.paused is False and self.game_over is False:
+            self.current_block.move(0, 1)
+
+            if self.block_inside() is False or self.block_fits() is False:
+                self.current_block.move(0, -1)
 
     def move_down(self):
         """move_down"""
 
-        self.current_block.move(1, 0)
-        if self.block_inside() is False or self.block_fits() is False:
-            self.current_block.move(-1, 0)
-            self.lock_block()
+        if self.paused is False and self.game_over is False:
+            self.current_block.move(1, 0)
+
+            if self.block_inside() is False or self.block_fits() is False:
+                self.current_block.move(-1, 0)
+                self.lock_block()
 
     def rotate(self):
         """rotate"""
-        self.current_block.rotate()
-        if self.block_inside() is False or self.block_fits() is False:
-            self.current_block.undo_rotate()
-        else:
-            # self.rotate_sound.play()
-            pass
+
+        if self.paused is False and self.game_over is False:
+            self.current_block.rotate()
+
+            if self.block_inside() is False or self.block_fits() is False:
+                self.current_block.undo_rotate()
+            else:
+                # self.rotate_sound.play()
+                pass
 
     def get_random_block(self):
         """get_random_block"""
@@ -188,21 +200,34 @@ def tetrix(args: list):
             if event.type == pygame.QUIT:
                 run = False
                 break
-            if event.type == pygame.KEYDOWN:
-                if game.game_over is True:
-                    game.game_over = False
-                    game.reset()
 
-                if event.key == pygame.K_LEFT and game.game_over is False:
+            if event.type == pygame.KEYDOWN:
+
+                if game.game_over is True:
+                    if event.key == pygame.K_RETURN:
+                        game.reset()
+
+                if event.key == pygame.K_SPACE and game.game_over is False:
+
+                    if game.paused:
+                        game.paused = False
+                    else:
+                        game.paused = True
+
+                if event.key == pygame.K_LEFT:
                     game.move_left()
-                if event.key == pygame.K_RIGHT and game.game_over is False:
+
+                if event.key == pygame.K_RIGHT:
                     game.move_right()
-                if event.key == pygame.K_DOWN and game.game_over is False:
+
+                if event.key == pygame.K_DOWN:
                     game.move_down()
                     game.update_score(0, 1)
-                if event.key == pygame.K_UP and game.game_over is False:
+
+                if event.key == pygame.K_UP:
                     game.rotate()
-            if event.type == GAME_UPDATE and game.game_over is False:
+
+            if event.type == GAME_UPDATE:
                 game.move_down()
 
         score_value_surface = config.font.render(str(game.score), True, Colors.white)
