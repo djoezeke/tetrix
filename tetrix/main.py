@@ -4,7 +4,7 @@ import sys
 import random
 import pygame
 
-from tetrix import config
+from tetrix.game import config
 from tetrix.game.colors import Colors
 from tetrix.game.grid import Grid
 
