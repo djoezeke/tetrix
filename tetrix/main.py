@@ -19,6 +19,14 @@ from tetrix.game.blocks import ZBlock
 GAME_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(GAME_UPDATE, 200)
 
+score_suface = config.font.render("Score", True, Colors.white)
+score_rect = pygame.Rect(320, 55, 170, 60)
+
+next_suface = config.font.render("Next", True, Colors.white)
+next_rect = pygame.Rect(320, 215, 170, 180)
+
+over_suface = config.font.render("GAME OVER", True, Colors.white)
+
 
 class Game:
     """Game"""
@@ -70,6 +78,26 @@ class Game:
 
     def draw(self, screen: pygame.Surface):
         """draw"""
+        score_value_surface = config.font.render(str(game.score), True, Colors.white)
+
+        screen.fill(Colors.dark_blue)
+        screen.blit(score_suface, (365, 20, 50, 50))
+        screen.blit(next_suface, (375, 150, 50, 50))
+
+        if self.game_over is True:
+            screen.blit(over_suface, (320, 450, 50, 50))
+
+        pygame.draw.rect(screen, Colors.light_blue, score_rect, 0, 10)
+
+        config.WINDOW.blit(
+            score_value_surface,
+            score_value_surface.get_rect(
+                centerx=score_rect.centerx, centery=score_rect.centery
+            ),
+        )
+
+        pygame.draw.rect(screen, Colors.light_blue, next_rect, 0, 10)
+
         self.grid.draw(screen)
         self.current_block.draw(screen, 11, 11)
         self.next_block.draw(screen, 270, 270)
@@ -124,6 +152,10 @@ class Game:
             if self.block_inside() is False or self.block_fits() is False:
                 self.current_block.move(0, -1)
 
+    def update(self):
+        """update"""
+        self.move_down()
+
     def move_down(self):
         """move_down"""
 
@@ -166,13 +198,6 @@ class Game:
 
 
 game = Game()
-score_suface = config.font.render("Score", True, Colors.white)
-score_rect = pygame.Rect(320, 55, 170, 60)
-
-next_suface = config.font.render("Next", True, Colors.white)
-next_rect = pygame.Rect(320, 215, 170, 180)
-
-over_suface = config.font.render("GAME OVER", True, Colors.white)
 
 
 def tetrix(args: list):
@@ -228,27 +253,8 @@ def tetrix(args: list):
                     game.rotate()
 
             if event.type == GAME_UPDATE:
-                game.move_down()
+                game.update()
 
-        score_value_surface = config.font.render(str(game.score), True, Colors.white)
-
-        config.WINDOW.fill(Colors.dark_blue)
-        config.WINDOW.blit(score_suface, (365, 20, 50, 50))
-        config.WINDOW.blit(next_suface, (375, 150, 50, 50))
-
-        if game.game_over is True:
-            config.WINDOW.blit(over_suface, (320, 450, 50, 50))
-
-        pygame.draw.rect(config.WINDOW, Colors.light_blue, score_rect, 0, 10)
-
-        config.WINDOW.blit(
-            score_value_surface,
-            score_value_surface.get_rect(
-                centerx=score_rect.centerx, centery=score_rect.centery
-            ),
-        )
-
-        pygame.draw.rect(config.WINDOW, Colors.light_blue, next_rect, 0, 10)
         game.draw(config.WINDOW)
 
     pygame.quit()
