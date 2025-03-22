@@ -1,4 +1,4 @@
-"""Constants"""
+"""Main Tetrix Color Constants"""
 
 
 class Colors:
