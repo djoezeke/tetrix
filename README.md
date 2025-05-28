@@ -5,7 +5,7 @@ The game features the traditional Tetris gameplay, including 7 different tetromi
 
 ## Screenshots
 
-![Screenshot](https://github.com/djoezeke/tetrix)
+![Screenshot](assets/screenshot.png)
 
 ## 🚀 Features
 
